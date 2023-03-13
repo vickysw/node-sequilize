@@ -16,7 +16,7 @@ const {sequelize} = require('./../config/database/db');
     },
 
     // A column for the author name 
-    authorName: {
+    autherId: {
         type: DataTypes.STRING
         // remember allowNull defaults to true
     }

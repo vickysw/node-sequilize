@@ -22,6 +22,16 @@ const seDb = require("./config/database/db");
             console.log('Could not synced DB'+err.message);
         });
 
+    const {verifyToken} = require("./middleware/authJwt");
+
     const bookRouter = require('./routes/bookRoutes');
-    app.use('/api/v1/books',bookRouter);
+    const userRouter = require('./routes/userRoutes');
+    const authRouter = require('./routes/authRoutes');
+
+    app.use('/api/v1/books',[verifyToken],bookRouter);
+    app.use('/api/v1/users',[verifyToken],userRouter);
+    app.use('/api/v1/auth',authRouter);
+
+
+    
 module.exports = app;

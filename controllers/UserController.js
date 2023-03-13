@@ -1,11 +1,12 @@
 // const { Sequelize } = require("sequelize");
 
-const {Book} = require("./../models/BookModel");
+const {User} = require("../models/UserModel");
 const {getPagination,getPagingData} = require('../models/pagination');
 
-const readXlsxFile = require("read-excel-file/node"); 
+// const readXlsxFile = require("read-excel-file/node"); 
+const bcrypt = require("bcrypt");
 
-exports.upload = async (req,res) => {
+/* exports.upload = async (req,res) => {
 
     try{
     if (req.file == undefined) {
@@ -30,7 +31,7 @@ exports.upload = async (req,res) => {
             books.push(book);
           });
 
-          Book.bulkCreate(books).then(()=>{
+          User.bulkCreate(books).then(()=>{
             res.status(200).send({
                 message: "Uploaded the file successfully: " + req.file.originalname,
               });
@@ -48,27 +49,10 @@ exports.upload = async (req,res) => {
           message: "Could not upload the file: " + req.file.originalname,
         });
     }
-} ;
+} ; */
 // Create and Save a new Books
 exports.create = (req, res) => {
-  //Validate request
-  if (!req.body.title) {
-    res.status(400).send({ message: "Content can not be empty" });
-  }
-
-  const book = {
-    title: req.body.title,
-    price:req.body.price,
-    authorName:req.body.authorName
-  }
-
-  Book.create(book).then(data=>{
-    res.send(data)}).catch(err=>{
-        res.status(500).send({
-            message:err.message || 'Some error occured while creating book'
-        })
-    
-  })
+ 
 };
 
 // Retrieve all Bookss from the database.
@@ -78,7 +62,7 @@ exports.findAll = (req, res) => {
      var condition = title ? { title: { [like]: `%${title}%` } } : null;
 
     const { limit, offset } = getPagination(page, size);
-    Book.findAndCountAll({attributes: ['id', 'title'],where:condition,limit,offset})
+    User.findAndCountAll({attributes: ['id', 'title','authorName'],where:condition,limit,offset})
         .then((data)=>{
             const response = getPagingData(data, page, limit);
             res.send(response)})
@@ -93,7 +77,7 @@ exports.findAllRecords = (req, res) => {
     const title = req.query.title;
      var condition = title ? { title: { [like]: `%${title}%` } } : null;
 
-    Book.findAll({attributes: ['id', 'title'],where:condition})
+    User.findAll({attributes: ['id', 'title','authorName'],where:condition})
         .then((data)=>{
             res.send(data)})
         .catch((err)=>{
@@ -106,7 +90,7 @@ exports.findAllRecords = (req, res) => {
 // Find a single Books with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    Book.findByPk(id).then(data=>{
+    User.findByPk(id).then(data=>{
         res.send(data)}).catch(err=>{
             res.status(500).send({
                 message:err.message || 'Some error occured while retrieving book'
@@ -119,7 +103,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     const id = req.params.id;
 
-    Book.update(req.body,{
+    User.update(req.body,{
         where: { id: id }
     }).then(num=>{
         if(num==1){
@@ -129,7 +113,7 @@ exports.update = (req, res) => {
         }
     }).catch(err=>{
         res.status(500).send({
-            message:"Error while updating book."
+            message:"Error while updating User."
         });
     })
 }
@@ -138,32 +122,32 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     const id = req.params.id
 
-    Book.destroy({
+    User.destroy({
         where:{id:id}
     }).then(num=>{
         if(num==1)
         {
             res.status({message:"book deleted successfully."})
         }else{
-            res.status({message:"could not deleted book."})
+            res.status({message:"could not deleted User."})
         }
     }).catch(err=>{
         res.status(500).send({
-            message:"Error while deleting book."
+            message:"Error while deleting User."
         })
     })
 };
 
 // Delete all Bookss from the database.
 exports.deleteAll = (req, res) => {
-    Book.destroy({
+    User.destroy({
         where:{},
         Truncate:false
     }).then(num=>{     
-            res.status({message:"could not deleted book."})
+            res.status({message:"could not deleted User."})
     }).catch(err=>{
         res.status(500).send({
-            message:"Error while deleting book."
+            message:"Error while deleting User."
         })
     })
 };
